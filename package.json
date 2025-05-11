@@ -1,0 +1,90 @@
+{
+  "name": "fastify-recaptcha",
+  "version": "1.0.0",
+  "description": "Fastify plugin for Google reCAPTCHA v2 and v3 verification",
+  "main": "dist/fastify-recaptcha.cjs.js",
+  "module": "dist/fastify-recaptcha.esm.js",
+  "scripts": {
+    "build": "preconstruct build",
+    "dev": "preconstruct dev",
+    "watch": "preconstruct watch",
+    "lint": "eslint \"{src,test}/**/*.ts\" --fix",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "release:patch": "standard-version --release-as patch",
+    "release:minor": "standard-version --release-as minor",
+    "release:major": "standard-version --release-as major",
+    "release:rc": "standard-version --prerelease rc"
+  },
+  "keywords": [
+    "fastify",
+    "recaptcha",
+    "google",
+    "captcha",
+    "verification",
+    "plugin",
+    "middleware",
+    "security",
+    "validation"
+  ],
+  "author": "Fikret ISILDAK <isildakfikret@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/isildakfikret/fastify-recaptcha.git"
+  },
+  "bugs": {
+    "url": "https://github.com/isildakfikret/fastify-recaptcha/issues"
+  },
+  "homepage": "https://github.com/isildakfikret/fastify-recaptcha#readme",
+  "funding": {
+    "type": "individual",
+    "url": "https://github.com/sponsors/isildakfikret"
+  },
+  "contributors": [
+    {
+      "name": "Fikret ISILDAK",
+      "email": "isildakfikret@gmail.com",
+      "url": "https://github.com/isildakfikret"
+    }
+  ],
+  "packageManager": "pnpm@10.10.0",
+  "engines": {
+    "npm": ">=10.0.0",
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "fastify-plugin": "^5.0.1"
+  },
+  "devDependencies": {
+    "@babel/preset-typescript": "^7.27.1",
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.26.0",
+    "@preconstruct/cli": "^2.8.12",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.15.17",
+    "@types/supertest": "^6.0.3",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.4.0",
+    "fastify": "^5.3.2",
+    "globals": "^16.1.0",
+    "jest": "^29.7.0",
+    "prettier": "^3.5.3",
+    "source-map-support": "^0.5.21",
+    "standard-version": "^9.5.0",
+    "supertest": "^7.1.0",
+    "ts-jest": "^29.3.2",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.32.0"
+  },
+  "peerDependencies": {
+    "fastify": "^5.3.2"
+  },
+  "babel": {
+    "presets": [
+      "@babel/preset-typescript"
+    ]
+  }
+}
