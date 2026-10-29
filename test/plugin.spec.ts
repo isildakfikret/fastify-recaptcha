@@ -95,6 +95,28 @@ describe('Fastify-Recaptcha Tests', () => {
     expect(response.body).toEqual({ error: 'Invalid token' });
   });
 
+  it('should rate limit verification requests by client IP', async () => {
+    const mockVerify = vi.fn().mockResolvedValue(true);
+    (RecaptchaHttpClient as Mock).mockImplementation(function () {
+      return { verify: mockVerify };
+    });
+
+    await app.register(fastifyRecaptcha, {
+      ...generatePluginOptions(),
+      rateLimit: { max: 1, timeWindow: 60_000 },
+    });
+    app.get('/test', async () => ({ success: true }));
+    await app.ready();
+
+    const firstResponse = await supertest(app.server).get('/test').set('x-recaptcha-response', 'valid-token');
+    const limitedResponse = await supertest(app.server).get('/test').set('x-recaptcha-response', 'valid-token');
+
+    expect(firstResponse.status).toBe(200);
+    expect(limitedResponse.status).toBe(429);
+    expect(limitedResponse.body).toEqual({ error: 'Rate limit exceeded' });
+    expect(mockVerify).toHaveBeenCalledTimes(1);
+  });
+
   it('should skip recaptcha validation if route config disables it', async () => {
     const options = generatePluginOptions();
     await app.register(fastifyRecaptcha, options);

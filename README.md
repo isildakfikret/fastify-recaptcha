@@ -88,8 +88,9 @@ The plugin adds a global `onRequest` hook. For each request it:
 
 1. Skips the check if the route has `config: { recaptcha: false }`.
 2. Reads the token from the **`x-recaptcha-response` request header**. If it is missing, it replies `400`.
-3. Sends the token and your secret key to `https://www.google.com/recaptcha/api/siteverify`.
-4. Lets the request continue to your handler if Google reports `success: true`. Otherwise it replies with an error (see [Error reference](#error-reference)).
+3. Limits verification to 100 requests per client IP per minute by default. Excess requests receive `429`.
+4. Sends the token and your secret key to `https://www.google.com/recaptcha/api/siteverify`.
+5. Lets the request continue to your handler if Google reports `success: true`. Otherwise it replies with an error (see [Error reference](#error-reference)).
 
 The plugin is wrapped with `fastify-plugin`, so the hook applies to the scope you register it in and its children. Register it on the root instance to protect everything, or inside an encapsulated plugin to protect only that part of your app.
 
@@ -123,13 +124,17 @@ If your frontend runs on another origin, make sure your CORS configuration allow
 app.register(fastifyRecaptcha, {
   secretKey: 'your-secret-key',
   err: (error) => ({ error: error.message }),
+  rateLimit: { max: 100, timeWindow: 60_000 },
 });
 ```
 
-| Option      | Type                                        | Required | Default                             | Description                                                            |
-| ----------- | ------------------------------------------- | -------- | ----------------------------------- | ---------------------------------------------------------------------- |
-| `secretKey` | `string`                                    | yes      | -                                   | Your reCAPTCHA secret key. Registration fails if it is empty or blank. |
-| `err`       | `(err: Error \| RecaptchaPluginError) => T` | no       | `(err) => ({ error: err.message })` | Builds the response body that is sent when verification fails.         |
+| Option      | Type                                        | Required | Default                             | Description                                                                        |
+| ----------- | ------------------------------------------- | -------- | ----------------------------------- | ---------------------------------------------------------------------------------- |
+| `secretKey` | `string`                                    | yes      | -                                   | Your reCAPTCHA secret key. Registration fails if it is empty or blank.             |
+| `err`       | `(err: Error \| RecaptchaPluginError) => T` | no       | `(err) => ({ error: err.message })` | Builds the response body that is sent when verification fails.                     |
+| `rateLimit` | `{ max?: number; timeWindow?: number }`     | no       | `100` requests per `60_000` ms      | Limits verification attempts per client IP. Both values must be positive integers. |
+
+`rateLimit.timeWindow` is in milliseconds. The client IP is taken from Fastify's `request.ip`; configure `trustProxy` appropriately when running behind a proxy. Rate-limited requests receive `429` and do not call Google's verification API.
 
 Registering the plugin twice on the same instance throws `Recaptcha plugin is already registered`.
 
