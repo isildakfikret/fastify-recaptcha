@@ -398,3 +398,10 @@ Temporary Items
 dist
 .webpack
 .serverless/**/*.zip
+
+
+# AI Agent files
+.ai-agent/
+.ai
+AGENTS.md
+CLAUDE.md
