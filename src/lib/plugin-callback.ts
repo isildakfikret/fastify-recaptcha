@@ -19,7 +19,7 @@ export const pluginCallback: FastifyPluginCallback<RecaptchaPluginOptions<{ erro
     if (fastify.hasDecorator(pluginId)) return done(new Error('Recaptcha plugin is already registered'));
     if (!options.secretKey?.trim()) return done(new Error('Recaptcha secret key is required'));
 
-    const opts = { ...defaultOptions, ...options };
+    const opts = { ...defaultOptions, ...options } as Required<RecaptchaPluginOptions<{ error: string }>>;
     fastify.decorate(pluginId, {
       getter() {
         return true;
