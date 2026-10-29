@@ -1,10 +1,11 @@
+import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 import fastify, { FastifyInstance } from 'fastify';
-import * as supertest from 'supertest';
+import supertest from 'supertest';
 import { fastifyRecaptcha } from '../src';
 import { RecaptchaHeaderNotFoundError, RecaptchaPluginError } from '../src/errors';
 import { RecaptchaHttpClient } from '../src/lib/recaptcha-http-client';
 
-jest.mock('../src/lib/recaptcha-http-client');
+vi.mock('../src/lib/recaptcha-http-client');
 
 const generatePluginOptions = () => ({
   secretKey: '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe', // Google test secret key
@@ -42,10 +43,10 @@ describe('Fastify-Recaptcha Tests', () => {
   });
 
   it('should add the onRequest hook and validate recaptcha', async () => {
-    const mockVerify = jest.fn().mockResolvedValue(true);
-    (RecaptchaHttpClient as jest.Mock).mockImplementation(() => ({
-      verify: mockVerify,
-    }));
+    const mockVerify = vi.fn().mockResolvedValue(true);
+    (RecaptchaHttpClient as Mock).mockImplementation(function () {
+      return { verify: mockVerify };
+    });
 
     const options = generatePluginOptions();
     app.register(fastifyRecaptcha, options);
@@ -76,10 +77,10 @@ describe('Fastify-Recaptcha Tests', () => {
   });
 
   it('should return custom error if recaptcha verification fails', async () => {
-    const mockVerify = jest.fn().mockRejectedValue(new RecaptchaPluginError('Invalid token', 401));
-    (RecaptchaHttpClient as jest.Mock).mockImplementation(() => ({
-      verify: mockVerify,
-    }));
+    const mockVerify = vi.fn().mockRejectedValue(new RecaptchaPluginError('Invalid token', 401));
+    (RecaptchaHttpClient as Mock).mockImplementation(function () {
+      return { verify: mockVerify };
+    });
 
     const options = generatePluginOptions();
     await app.register(fastifyRecaptcha, options);
