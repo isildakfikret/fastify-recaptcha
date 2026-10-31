@@ -4,7 +4,6 @@
 [![NPM Version](https://img.shields.io/npm/v/fastify-recaptcha.svg)](https://www.npmjs.com/package/fastify-recaptcha)
 [![Build Status](https://github.com/isildakfikret/fastify-recaptcha/actions/workflows/ci.yml/badge.svg)](https://github.com/isildakfikret/fastify-recaptcha/actions)
 [![Downloads](https://img.shields.io/npm/dm/fastify-recaptcha.svg)](https://www.npmjs.com/package/fastify-recaptcha)
-[![Sponsor](https://img.shields.io/badge/sponsor-GitHub%20Sponsors-critical)](https://github.com/sponsors/isildakfikret)
 
 A [Fastify](https://fastify.dev) plugin that verifies Google reCAPTCHA (v2 and v3) tokens on incoming requests. Register it once and every route is protected. Routes that should stay public can opt out individually.
 
@@ -52,32 +51,32 @@ yarn add fastify-recaptcha
 ## Quick start
 
 ```ts
-import fastify from 'fastify';
-import fastifyRecaptcha from 'fastify-recaptcha';
+import fastify from 'fastify'
+import fastifyRecaptcha from 'fastify-recaptcha'
 
-const app = fastify();
+const app = fastify()
 
 await app.register(fastifyRecaptcha, {
-  secretKey: process.env.RECAPTCHA_SECRET_KEY!,
-});
+  secretKey: process.env.RECAPTCHA_SECRET_KEY!
+})
 
 // Protected: the request must carry a valid `x-recaptcha-response` header.
-app.post('/login', async () => ({ success: true }));
+app.post('/login', async () => ({ success: true }))
 
 // Public: verification is skipped for this route.
-app.get('/health', { config: { recaptcha: false } }, async () => 'ok');
+app.get('/health', { config: { recaptcha: false } }, async () => 'ok')
 
-await app.listen({ port: 3000 });
+await app.listen({ port: 3000 })
 ```
 
 CommonJS works too:
 
 ```js
-const app = require('fastify')();
+const app = require('fastify')()
 
 app.register(require('fastify-recaptcha').default, {
-  secretKey: process.env.RECAPTCHA_SECRET_KEY,
-});
+  secretKey: process.env.RECAPTCHA_SECRET_KEY
+})
 ```
 
 The package also exposes a named export, `import { fastifyRecaptcha } from 'fastify-recaptcha'`.
@@ -101,16 +100,16 @@ The token must be sent in the `x-recaptcha-response` **header**, not in the requ
 
 ```js
 // reCAPTCHA v3
-const token = await grecaptcha.execute('YOUR_SITE_KEY', { action: 'login' });
+const token = await grecaptcha.execute('YOUR_SITE_KEY', { action: 'login' })
 
 await fetch('/login', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
-    'x-recaptcha-response': token,
+    'x-recaptcha-response': token
   },
-  body: JSON.stringify({ username, password }),
-});
+  body: JSON.stringify({ username, password })
+})
 ```
 
 For reCAPTCHA v2, use the value returned by `grecaptcha.getResponse()` the same way.
@@ -122,8 +121,8 @@ If your frontend runs on another origin, make sure your CORS configuration allow
 ```ts
 app.register(fastifyRecaptcha, {
   secretKey: 'your-secret-key',
-  err: (error) => ({ error: error.message }),
-});
+  err: error => ({ error: error.message })
+})
 ```
 
 | Option      | Type                                        | Required | Default                             | Description                                                            |
@@ -138,7 +137,7 @@ Registering the plugin twice on the same instance throws `Recaptcha plugin is al
 Set `recaptcha: false` in the route config:
 
 ```ts
-app.get('/public', { config: { recaptcha: false } }, async () => 'anyone can call this');
+app.get('/public', { config: { recaptcha: false } }, async () => 'anyone can call this')
 ```
 
 Any other value, or no `recaptcha` key at all, keeps verification on.
@@ -153,10 +152,10 @@ app.register(fastifyRecaptcha, {
   err(error) {
     return {
       success: false,
-      errors: [error.message],
-    };
-  },
-});
+      errors: [error.message]
+    }
+  }
+})
 ```
 
 Failed request example:
@@ -179,17 +178,17 @@ All plugin errors extend `RecaptchaPluginError`, which carries a `status` proper
 | `RecaptchaVerificationInvalidError` | Google's status | Google's API returned a non-2xx response.                     |
 
 ```ts
-import { errors } from 'fastify-recaptcha';
+import { errors } from 'fastify-recaptcha'
 
 app.register(fastifyRecaptcha, {
   secretKey: process.env.RECAPTCHA_SECRET_KEY!,
   err(error) {
     if (error instanceof errors.RecaptchaHeaderNotFoundError) {
-      return { message: 'Please complete the captcha.' };
+      return { message: 'Please complete the captcha.' }
     }
-    return { message: 'Captcha verification failed.' };
-  },
-});
+    return { message: 'Captcha verification failed.' }
+  }
+})
 ```
 
 Errors that are not `RecaptchaPluginError` instances, for example a network failure while calling Google, are not formatted by `err`. They are rethrown and handled by Fastify's normal error handling (usually a `500`).
@@ -199,7 +198,7 @@ Errors that are not `RecaptchaPluginError` instances, for example a network fail
 Types are included. The `recaptcha` route option is added to Fastify's `FastifyContextConfig`, so `config: { recaptcha: false }` is type-checked. The option types are exported as well:
 
 ```ts
-import fastifyRecaptcha, { type RecaptchaPluginOptions, errors } from 'fastify-recaptcha';
+import fastifyRecaptcha, { type RecaptchaPluginOptions, errors } from 'fastify-recaptcha'
 ```
 
 ## Limitations
